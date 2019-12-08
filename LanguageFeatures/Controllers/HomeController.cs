@@ -1,6 +1,7 @@
 ﻿using LanguageFeatures.Models;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Web.Mvc;
 
 namespace LanguageFeatures.Controllers
@@ -100,6 +101,78 @@ namespace LanguageFeatures.Controllers
             };
             decimal total = shoppingCart.TotalPrices();
             return View("Result", (object)string.Format("Razem: {0:c}", total));
+        }
+
+        public ViewResult UseFilterExtensionMethod()
+        {
+            IEnumerable<Product> shopingCart = new ShoppingCart()
+            {
+                Products = new List<Product>()
+                {
+                    new Product { Name = "Kajak", Category = "Sporty Wodne", Price = 275M },
+                    new Product { Name = "Kajak", Category = "Sporty Wodne", Price = 375M },
+                    new Product { Name = "Piłka nożna", Category = "Piłka nożna", Price = 100M },
+                    new Product { Name = "Piłka nożna", Category = "Piłka nożna", Price = 100M },
+                }
+            };
+
+            // Func<Product, bool> categoryFilter = delegate (Product prod)
+            // {
+            //      return prod.Category == "Piłka nożna";
+            // };
+
+            Func<Product, bool> categoryFilter = prod => prod.Category == "Piłka nożna";
+
+            decimal total = 0;
+
+            foreach (Product prod in shopingCart.Filter(categoryFilter))
+            {
+                total += prod.Price;
+            }
+
+            return View("Result", (object)string.Format("Razem: {0:c}", total));
+        }
+
+        public ViewResult UseFilterExtensionMethod2()
+        {
+            IEnumerable<Product> shopingCart = new ShoppingCart()
+            {
+                Products = new List<Product>()
+                {
+                    new Product { Name = "Kajak", Category = "Sporty Wodne", Price = 275M },
+                    new Product { Name = "Kajak", Category = "Sporty Wodne", Price = 375M },
+                    new Product { Name = "Piłka nożna", Category = "Piłka nożna", Price = 100M },
+                    new Product { Name = "Piłka nożna", Category = "Piłka nożna", Price = 200M },
+                }
+            };
+
+            decimal total = 0;
+
+            foreach (Product prod in shopingCart.Filter(prod => prod.Category == "Piłka nożna" || prod.Price > 100))
+            {
+                total += prod.Price;
+            }
+
+            return View("Result", (object)string.Format("Razem: {0:c}", total));
+        }
+
+        public ViewResult CreateAnonType()
+        {
+            var oddsAndEnds = new[]
+            {
+                new { name = "MVC", Category = "Wzorzec" },
+                new { name = "Kapelusz", Category = "Odzież" },
+                new { name = "Jabłko", Category = "Owoc" },
+            };
+
+            StringBuilder result = new StringBuilder();
+
+            foreach (var item in oddsAndEnds)
+            {
+                result.Append(item.name + " ");
+            }
+
+            return View("Result", result);
         }
     }
 }
