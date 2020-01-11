@@ -1,6 +1,7 @@
 ﻿using LanguageFeatures.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Web.Mvc;
 
@@ -173,6 +174,38 @@ namespace LanguageFeatures.Controllers
             }
 
             return View("Result", result);
+        }
+
+        public ViewResult FindProducts()
+        {
+            Product[] products =
+                {
+                    new Product { Name = "Kajak", Category = "Sporty Wodne", Price = 275M },
+                    new Product { Name = "Kajak", Category = "Sporty Wodne", Price = 375M },
+                    new Product { Name = "Piłka nożna", Category = "Piłka nożna", Price = 100M },
+                    new Product { Name = "Piłka nożna", Category = "Piłka nożna", Price = 200M },
+                };
+            // var foundProducts = from match in products
+            //                    orderby match.Price descending
+            //                    select new { match.Name, match.Price };
+
+            var foundProducts = products.OrderByDescending(e => e.Price).Take(3).Select(e => new { e.Name, e.Price });
+
+            var sum = products.Sum(e => e.Price);
+            products[2] = new Product { Name = "Stadion", Price = 79000M };
+
+            // int count = 0;
+            StringBuilder result = new StringBuilder();
+            foreach (var p in foundProducts)
+            {
+                result.Append($"Cena  {p.Price} ");
+                // if (++count == 3)
+                // {
+                //     break;
+                // }
+            }
+            result.Append($" Suma  {sum} ");
+            return View("Result", (object)result.ToString());
         }
     }
 }
